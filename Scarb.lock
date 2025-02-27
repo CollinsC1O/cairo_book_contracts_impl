@@ -2,7 +2,7 @@
 version = 1
 
 [[package]]
-name = "reg_contract_addrs"
+name = "cairo_book_contracts_impl"
 version = "0.1.0"
 dependencies = [
  "snforge_std",
