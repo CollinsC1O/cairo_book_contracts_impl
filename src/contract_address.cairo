@@ -1,7 +1,7 @@
 use starknet::{ContractAddress};
 #[starknet::interface]
 pub trait IAddressList<TContractState> {
-    fn register_caller(ref self: TContractState);
+    fn register_address(ref self: TContractState);
     fn get_n_th_registered_addrss(self: @TContractState, index: u64) -> Option::<ContractAddress>;
 }
 
@@ -19,7 +19,7 @@ mod AddressList {
 
     #[abi(embed_v0)]
     impl AddressListImpl of super::IAddressList<ContractState> {
-        fn register_caller(ref self: ContractState) {
+        fn register_address(ref self: ContractState) {
             //get caller address
             let caller: ContractAddress = get_caller_address();
             self.addresses.append().write(caller);
