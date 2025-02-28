@@ -4,6 +4,9 @@ pub trait IAddressList<TContractState> {
     fn register_address(ref self: TContractState);
     fn get_n_th_registered_addrss(self: @TContractState, index: u64) -> Option::<ContractAddress>;
     fn get_all_address(self: @TContractState) -> Array<ContractAddress>;
+    fn modify_nth_address(ref self: TContractState, index: u64, new_address: ContractAddress);
+    fn add_user(ref self: TContractState, index: u64, new_user: ContractAddress);
+    // fn remove_user(ref self: TContractState, index: u64) -> bool;
 }
 
 #[starknet::contract]
@@ -28,8 +31,12 @@ mod AddressList {
         fn get_n_th_registered_addrss(
             self: @ContractState, index: u64,
         ) -> Option::<ContractAddress> {
-            // DEV: here we are using storage_prt because with vec<> type as the address was appended it
-            //      returned a storage pointer instead of an actual slot as with storage memory
+            // DEV: here we are using storage_prt because with vec<> type as the address was
+            // appended it
+            // returned a storage pointer instead of an actual slot as with storage memory
+            // for retrieving from the vec<> we used get() here, we could still use at() but if at()
+            // is used if the index is out of bound, the at() method panics but the get() method
+            // returns None.
             if let Option::Some(storage_ptr) = self.addresses.get(index) {
                 return Option::Some(storage_ptr.read());
             }
@@ -48,5 +55,29 @@ mod AddressList {
             // return the array containing all the addresses
             address
         }
+
+        fn modify_nth_address(ref self: ContractState, index: u64, new_address: ContractAddress) {
+            let mut storage_ptr = self.addresses.at(index);
+            storage_ptr.write(new_address);
+        }
+        fn add_user(ref self: ContractState, index: u64, new_user: ContractAddress) {
+            let 
+            self.addresses.append.write(new_user)
+        }
+        // fn remove_user(ref self: ContractState, index: u64) -> bool {
+    //     let vec_len = self.addresses.len();
+    //     if index >= vec_len{
+    //         return false;
+    //     }
+
+        //     for i in index..(vec_len - 1) {
+    //         let next_address = self.addresses.at(i + 1).read();
+    //         let current_address = self.addresses.at(i);
+    //         current_address.write(next_address);
+    //     };
+
+        //     MutableVecTrait::pop_front_at(ref self.addresses, index)
+    //     return true;
+    // }
     }
 }
