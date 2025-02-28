@@ -8,6 +8,7 @@ pub trait IAddressList<TContractState> {
     fn add_user(ref self: TContractState, index: u64, new_user: ContractAddress);
     fn modify_address(ref self: TContractState, index: u64, new_address: ContractAddress);
     // fn remove_user(ref self: TContractState, index: u64) -> bool;
+    fn store_addrs_from_array(ref self: TContractState);
 }
 
 #[starknet::contract]
@@ -70,19 +71,39 @@ mod AddressList {
             storage_ptr.write(new_address);
         }
         // fn remove_user(ref self: ContractState, index: u64) -> bool {
-    //     let vec_len = self.addresses.len();
-    //     if index >= vec_len{
-    //         return false;
-    //     }
+        //     let vec_len = self.addresses.len();
+        //     if index >= vec_len{
+        //         return false;
+        //     }
 
         //     for i in index..(vec_len - 1) {
-    //         let next_address = self.addresses.at(i + 1).read();
-    //         let current_address = self.addresses.at(i);
-    //         current_address.write(next_address);
-    //     };
+        //         let next_address = self.addresses.at(i + 1).read();
+        //         let current_address = self.addresses.at(i);
+        //         current_address.write(next_address);
+        //     };
 
         //     MutableVecTrait::pop_front_at(ref self.addresses, index)
-    //     return true;
-    // }
+        //     return true;
+        // }
+
+        fn store_addrs_from_array(ref self: ContractState) {
+            let mut address: Array<ContractAddress> = array![];
+
+            let first_addrs: ContractAddress = 0x11ab.try_into().unwrap();
+            let second_addrs: ContractAddress = 0x12ab.try_into().unwrap();
+            let third_addrss: ContractAddress = 0x13ab.try_into().unwrap();
+
+            address.append(first_addrs);
+            address.append(second_addrs);
+            address.append(third_addrss);
+
+            // lets iterate over the element of the array to append them into our vec<> in storage
+            // this is done because we can't directly store array into memory
+            for i in 0..address.len() {
+                //since returning an element from an array returns a snapshot, lets desnap(*) it
+                let address_ = *address.at(i);
+                self.addresses.append().write(address_)
+            }
+        }
     }
 }
