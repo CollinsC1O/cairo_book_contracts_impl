@@ -6,6 +6,7 @@ pub trait IAddressList<TContractState> {
     fn get_all_address(self: @TContractState) -> Array<ContractAddress>;
     fn modify_nth_address(ref self: TContractState, index: u64, new_address: ContractAddress);
     fn add_user(ref self: TContractState, index: u64, new_user: ContractAddress);
+    fn modify_address(ref self: TContractState, index: u64, new_address: ContractAddress);
     // fn remove_user(ref self: TContractState, index: u64) -> bool;
 }
 
@@ -61,8 +62,12 @@ mod AddressList {
             storage_ptr.write(new_address);
         }
         fn add_user(ref self: ContractState, index: u64, new_user: ContractAddress) {
-            let 
-            self.addresses.append.write(new_user)
+            self.addresses.append().write(new_user)
+        }
+
+        fn modify_address(ref self: ContractState, index: u64, new_address: ContractAddress) {
+            let mut storage_ptr = self.addresses.at(index);
+            storage_ptr.write(new_address);
         }
         // fn remove_user(ref self: ContractState, index: u64) -> bool {
     //     let vec_len = self.addresses.len();
