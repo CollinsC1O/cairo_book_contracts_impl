@@ -21,6 +21,21 @@ mod AddressList {
     #[storage]
     struct Storage {
         addresses: Vec<ContractAddress>,
+        owner: Person,
+        expiration: Expiration,
+    }
+
+    #[derive(Drop, Serde, starknet::Store)]
+    struct Person {
+        address: ContractAddress,
+        name: felt252,
+    }
+
+    #[derive(Drop, Serde, starknet::Store)]
+    enum Expiration {
+        finite,
+        #[default]
+        infinite,
     }
 
     #[abi(embed_v0)]
@@ -100,7 +115,8 @@ mod AddressList {
             // lets iterate over the element of the array to append them into our vec<> in storage
             // this is done because we can't directly store array into memory
             for i in 0..address.len() {
-                //since returning an element from an array returns a snapshot, lets desnap(*) it
+                //since returning an element from an array returns a snapshot, lets
+                //desnap(*) it
                 let address_ = *address.at(i);
                 self.addresses.append().write(address_)
             }
